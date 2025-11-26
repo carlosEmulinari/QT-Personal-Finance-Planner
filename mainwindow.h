@@ -2,6 +2,12 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "account.h"
+#include "savings.h"
+#include "investiments.h"
+#include "consultant.h"
+
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -23,12 +29,10 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-
-    // --- Custom internal functions (no extra files required) ---
-    void openAccountSection();
-    void openSavingSection();
-    void openInvestmentSection();
-    void openConsultantSection();
+    Account *Account;
+    Savings *Savings;
+    Investiments *Investiments;
+    Consultant *Consultant;
 };
 
 #endif // MAINWINDOW_H

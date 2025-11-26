@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QMessageBox>
+#include <QDate>
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -18,42 +20,28 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_clicked()
 {
-    openAccountSection();
+    hide();
+    Account = new class Account(this);
+    Account->show();
 }
 
 void MainWindow::on_pushButton_2_clicked()
 {
-    openSavingSection();
+    hide();
+    Savings = new class Savings(this);
+    Savings->show();
 }
 
 void MainWindow::on_pushButton_3_clicked()
 {
-    openInvestmentSection();
+    hide();
+    Investiments = new class Investiments(this);
+    Investiments->show();
 }
 
 void MainWindow::on_pushButton_4_clicked()
 {
-    openConsultantSection();
-}
-
-// ---------------- Custom Internal Functions ----------------
-
-void MainWindow::openAccountSection()
-{
-    QMessageBox::information(this, "Account", "Opening Account Section...");
-}
-
-void MainWindow::openSavingSection()
-{
-    QMessageBox::information(this, "Saving", "Opening Saving Section...");
-}
-
-void MainWindow::openInvestmentSection()
-{
-    QMessageBox::information(this, "Investments", "Opening Investment Section...");
-}
-
-void MainWindow::openConsultantSection()
-{
-    QMessageBox::information(this, "Consultant", "Opening Consultant Section...");
+    hide();
+    Consultant = new class Consultant(this);
+    Consultant->show();
 }
