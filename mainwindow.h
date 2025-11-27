@@ -16,9 +16,8 @@ QT_END_NAMESPACE
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(QWidget *parent = nullptr, SerialComm *serialComm = nullptr);
     ~MainWindow();
 
 private slots:
@@ -33,6 +32,7 @@ private:
     Savings *Savings;
     Investiments *Investiments;
     Consultant *Consultant;
+    SerialComm *serial;
 };
 
 #endif // MAINWINDOW_H

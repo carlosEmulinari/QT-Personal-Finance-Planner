@@ -42,7 +42,7 @@ void Investiments::openInvestmentSection()
     {
         // Only send the invested amount (LCD is too small for full report)
         QString command = "INV:" + QString::number(investedAmount, 'f', 2) + "\n";
-        serial->write(command.toUtf8());
+        serial->sendData(command);
     }
     else
     {

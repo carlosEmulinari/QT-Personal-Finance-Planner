@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QSerialPort>
 #include <QSerialPortInfo>
-#include <QDir>
 #include <QDebug>
 
 class SerialComm : public QObject
@@ -15,20 +14,17 @@ public:
     explicit SerialComm(QObject *parent = nullptr);
 
     bool autoConnect();
-    bool openPort(const QString &portName);
-    void closePort();
+    bool isConnected() const;
     void sendData(const QString &data);
-    bool isOpen() const;
-    QSerialPort* getSerial() const { return serial; }
-    QSerialPort *serial;
-    QByteArray buffer;
-
 
 signals:
-    void dataReceived(const QString &data);
+    void newData(const QString &data);
 
 private slots:
     void readData();
+
+private:
+    QSerialPort serial;
 };
 
 #endif

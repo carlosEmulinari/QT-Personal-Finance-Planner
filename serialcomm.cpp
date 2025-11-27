@@ -1,87 +1,66 @@
 #include "serialcomm.h"
-#include <QThread>
 
 SerialComm::SerialComm(QObject *parent)
     : QObject(parent)
 {
-    serial = new QSerialPort(this);
-    connect(serial, &QSerialPort::readyRead, this, &SerialComm::readData);
+    connect(&serial, &QSerialPort::readyRead, this, &SerialComm::readData);
 }
 
 bool SerialComm::autoConnect()
 {
-#ifdef Q_OS_WIN
+    qDebug() << "[SerialComm] Searching for available ports...";
+
     QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
     for (const QSerialPortInfo &info : ports) {
-        if (openPort(info.portName()))
-            return true;
-    }
-#else
-    QDir devDir("/dev");
-    QStringList ports = devDir.entryList(QStringList() << "ttyUSB*" << "ttyACM*",
-                                         QDir::System | QDir::Readable);
+        qDebug() << "[SerialComm] Found port:" << info.portName()
+        << "Description:" << info.description();
 
-    for (const QString &port : ports) {
-        if (openPort("/dev/" + port))
-            return true;
+        if (info.portName().startsWith("ttyUSB") || info.portName().startsWith("ttyACM")) {
+            serial.setPort(info);
+            serial.setBaudRate(QSerialPort::Baud9600);
+
+            if (serial.open(QIODevice::ReadWrite)) {
+                qDebug() << "[SerialComm] Successfully connected to" << info.portName();
+                return true;
+            } else {
+                qDebug() << "[SerialComm] Failed to open" << info.portName()
+                << "Error:" << serial.errorString();
+            }
+        }
     }
-#endif
+
+    qDebug() << "[SerialComm] No Arduino found or permission denied.";
     return false;
 }
 
-bool SerialComm::openPort(const QString &portName)
+bool SerialComm::isConnected() const
 {
-    serial->setPortName(portName);
-    serial->setBaudRate(QSerialPort::Baud9600);
-    serial->setDataBits(QSerialPort::Data8);
-    serial->setParity(QSerialPort::NoParity);
-    serial->setStopBits(QSerialPort::OneStop);
-
-    if (serial->open(QIODevice::ReadWrite)) {
-        qDebug() << "Porta aberta:" << portName;
-        return true;
-    }
-
-    qDebug() << "Falha ao abrir porta:" << portName;
-    return false;
-}
-
-void SerialComm::closePort()
-{
-    if (serial->isOpen()) {
-        serial->close();
-        qDebug() << "Porta serial fechada.";
-    }
+    return serial.isOpen();
 }
 
 void SerialComm::sendData(const QString &data)
 {
-    if (!serial->isOpen()) {
-        qDebug() << "Porta fechada, não é possível enviar.";
-        return;
+    if (serial.isOpen()) {
+        QByteArray payload = data.toUtf8();
+        serial.write(payload);
+        qDebug() << "[SerialComm] Sent data:" << payload;
+    } else {
+        qDebug() << "[SerialComm] Attempted to send but serial not open.";
     }
-
-    serial->write(data.toUtf8());
-    serial->flush();
 }
-
-bool SerialComm::isOpen() const
-{
-    return serial->isOpen();
-}
-
 
 void SerialComm::readData()
 {
-    buffer.append(serial->readAll());
+    static QByteArray buffer;
+    buffer.append(serial.readAll());
 
-    // se não tem \n ainda, espera
-    if (!buffer.contains('\n'))
-        return;
+    int index;
+    while ((index = buffer.indexOf('\n')) != -1) {
+        QByteArray line = buffer.left(index).trimmed();
+        buffer.remove(0, index + 1);
 
-    QList<QByteArray> linhas = buffer.split('\n');
-    buffer = linhas.takeLast();
-
-    for (const QByteArray &linha : linhas)
-        emit dataReceived(QString::fromUtf8(linha).trimmed());
+        if (!line.isEmpty()) {
+            emit newData(QString::fromUtf8(line));
+        }
+    }
 }

@@ -4,9 +4,10 @@
 #include <QDate>
 
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(QWidget *parent, SerialComm *serialComm)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , serial(serialComm)
 {
     ui->setupUi(this);
 }

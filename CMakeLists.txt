@@ -35,6 +35,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         investiments.h investiments.cpp investiments.ui
         consultant.h consultant.cpp consultant.ui
         arduino.ino
+        serialcomm.cpp
+        serialcomm.h
+        serialcomm.h serialcomm.cpp
 
     )
 # Define target properties for Android with Qt 6 as:

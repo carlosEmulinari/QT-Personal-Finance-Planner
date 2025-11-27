@@ -33,7 +33,7 @@ void Savings::openSavingSection()
     if (serial && serial->isOpen()) {
 
         QString command = "SAVE:" + value + "\n";
-        serial->write(command.toUtf8());
+        serial->sendData(command);
 
     } else {
 
