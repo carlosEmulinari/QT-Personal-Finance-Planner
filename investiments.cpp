@@ -1,29 +1,29 @@
 #include "investiments.h"
-#include "ui_investiments.h"
+#include "securitylogs.h"
+#include "./ui_investiments.h"
 #include <QMessageBox>
-#include <QDate>
-#include <QSerialPort>
-#include <QSerialPortInfo>
+#include <QSettings>
+#include <QDialog>
 
-
-Investiments::Investiments(QWidget *parent)
+investiments::investiments(QWidget *parent)
     : QWidget(parent)
-    , ui(new Ui::Investiments)
+    , ui(new Ui::investiments)
 {
     ui->setupUi(this);
 
-    serial = new QSerialPort(this);
-    serial->setPortName("COM3");            // Change to your Arduino COM port
-    serial->setBaudRate(QSerialPort::Baud9600);
+    QSettings settings("PFPApp", "Investments");
+    QString savedValue = settings.value("investedAmount", "").toString();
 
-    if (!serial->open(QIODevice::WriteOnly)) {
-        QMessageBox::warning(this, "Warning", "Cannot open COM3 for Arduino.");
+    if (!savedValue.isEmpty()) {
+        ui->lineEditInvest->setText(savedValue);
     }
 }
 
-void Investiments::openInvestmentSection()
+void investiments::openInvestmentsSection()
 {
     QString investedText = ui->lineEditInvest->text();
+    if (investedText.isEmpty())
+        investedText = "0.00";
 
     // Default if empty
     double investedAmount = investedText.isEmpty() ? 0.0 : investedText.toDouble();
@@ -32,29 +32,22 @@ void Investiments::openInvestmentSection()
 
     double expectedReturn = investedAmount * returnRate;
 
+    Security::saveInvestment(expectedReturn);
+
     QString message;
     message += "Amount Invested: $" + QString::number(investedAmount, 'f', 2) + "\n";
     message += "Expected Return (8%): $" + QString::number(expectedReturn, 'f', 2);
 
     QMessageBox::information(this, "Investment Info", message);
 
-    if (serial && serial->isOpen())
-    {
-        // Only send the invested amount (LCD is too small for full report)
-        QString command = "INV:" + QString::number(investedAmount, 'f', 2) + "\n";
-        serial->sendData(command);
-    }
-    else
-    {
-        QMessageBox::warning(this, "Arduino Error",
-                             "Unable to send data.\nArduino is not connected.");
-    }
+    ui->lineEditInvest->setText(QString::number(Security::loadInvestment()));
+
+
+    connect(ui->closeButton, &QPushButton::clicked, this, &QWidget::close);
+
 }
 
-Investiments::~Investiments()
+investiments::~investiments()
 {
-    if (serial && serial->isOpen())
-        serial->close();
-
     delete ui;
 }

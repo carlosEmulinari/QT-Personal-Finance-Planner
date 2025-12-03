@@ -1,23 +1,27 @@
 #ifndef ACCOUNT_H
 #define ACCOUNT_H
-
+#include <QMessageBox>
 #include <QWidget>
+#include <QDate>
+#include <QDialog>
+
 
 namespace Ui {
-class Account;
+class account;
 }
 
-class Account : public QWidget
+class account : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit Account(QWidget *parent = nullptr);
-    ~Account();
+    explicit account(QWidget *parent = nullptr);
+    ~account();
+
+    void openAccountSection();
 
 private:
-    Ui::Account *ui;
-    void openAccountSection();
+    Ui::account *ui;
 };
 
-#endif // ACCOUNT_H
+#endif

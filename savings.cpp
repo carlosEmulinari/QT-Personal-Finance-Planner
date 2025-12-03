@@ -1,51 +1,48 @@
 #include "savings.h"
+#include "securitylogs.h"
 #include "ui_savings.h"
 #include <QMessageBox>
-#include <QDate>
-#include <QSerialPort>
-#include <QSerialPortInfo>
+#include <QSettings>
+#include <QDialog>
 
-Savings::Savings(QWidget *parent)
+savings::savings(QWidget *parent)
     : QWidget(parent)
-    , ui(new Ui::Savings)
+    , ui(new Ui::savings)
 {
     ui->setupUi(this);
-    serial = new QSerialPort(this);
-    serial->setPortName("COM3");            // Change for your Arduino port
-    serial->setBaudRate(QSerialPort::Baud9600);
 
-    if (!serial->open(QIODevice::WriteOnly)) {
-        QMessageBox::warning(this, "Warning", "Cannot open COM3 for Arduino.");
+    QSettings settings("PFPApp", "Savings");
+    QString savedValue = settings.value("savedAmount", "").toString();
+
+    if (!savedValue.isEmpty()) {
+        ui->lineEditSaving->setText(savedValue);
     }
+
 }
 
-void Savings::openSavingSection()
+void savings::openSavingsSection()
 {
     QString value = ui->lineEditSaving->text();
 
     if (value.isEmpty())
         value = "0.00";
 
-    QString message = "Total Saved Money: $" + value;
+    double savedMoney = value.toDouble();
+
+    // -------- SAVE PERMANENTLY --------
+    Security::saveSavings(savedMoney);
+
+    QString message = "Total Saved Money: $" + QString::number(savedMoney, 'f', 2);
 
     QMessageBox::information(this, "Saving Info", message);
 
-    if (serial && serial->isOpen()) {
+    ui->lineEditSaving->setText(QString::number(Security::loadSavings()));
 
-        QString command = "SAVE:" + value + "\n";
-        serial->sendData(command);
+    connect(ui->closeButton, &QPushButton::clicked, this, &QWidget::close);
 
-    } else {
-
-        QMessageBox::warning(this, "Arduino Error",
-                             "Unable to send data.\nArduino is not connected.");
-    }
 }
 
-Savings::~Savings()
+savings::~savings()
 {
-    if (serial && serial->isOpen())
-        serial->close();
-
     delete ui;
 }

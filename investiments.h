@@ -1,25 +1,24 @@
-#ifndef INVESTIMENTS_H
-#define INVESTIMENTS_H
-
+#ifndef CONSULTANT_H
+#define CONSULTANT_H
+#include <QDialog>
 #include <QWidget>
-#include <QSerialPort>
 
 namespace Ui {
-class Investiments;
+class investiments;
 }
 
-class Investiments : public QWidget
+class investiments : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit Investiments(QWidget *parent = nullptr);
-    ~Investiments();
+    explicit investiments(QWidget *parent = nullptr);
+    ~investiments();
+
+    void openInvestmentsSection();
 
 private:
-    Ui::Investiments *ui;
-    QSerialPort *serial;
-    void openInvestmentSection();
+    Ui::investiments *ui;
 };
 
-#endif // INVESTIMENTS_H
+#endif

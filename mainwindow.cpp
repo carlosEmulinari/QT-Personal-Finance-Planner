@@ -1,13 +1,15 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
+#include "./ui_mainwindow.h"
 #include <QMessageBox>
-#include <QDate>
+#include "aboutdialog.h"
+#include "account.h"
+#include "investiments.h"
+#include "savings.h"
 
 
-MainWindow::MainWindow(QWidget *parent, SerialComm *serialComm)
+MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
-    , serial(serialComm)
 {
     ui->setupUi(this);
 }
@@ -21,28 +23,24 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_clicked()
 {
-    hide();
-    Account = new class Account(this);
-    Account->show();
+    account *profile = new account(this);
+    profile->show();
 }
 
 void MainWindow::on_pushButton_2_clicked()
 {
-    hide();
-    Savings = new class Savings(this);
-    Savings->show();
+    savings *save = new savings(this);
+    save->show();
 }
 
 void MainWindow::on_pushButton_3_clicked()
 {
-    hide();
-    Investiments = new class Investiments(this);
-    Investiments->show();
+    investiments *invest = new investiments(this);
+    invest->show();
 }
 
-void MainWindow::on_pushButton_4_clicked()
+void MainWindow::on_pushButton_5_clicked()
 {
-    hide();
-    Consultant = new class Consultant(this);
-    Consultant->show();
+    AboutDialog about(this);
+    about.exec();
 }

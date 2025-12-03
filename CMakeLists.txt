@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(PersonalFinancePlanner VERSION 0.1 LANGUAGES CXX)
+project(PFP VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -9,64 +9,62 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Core SerialPort)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Core SerialPort)
 
 set(PROJECT_SOURCES
         main.cpp
         mainwindow.cpp
         mainwindow.h
-
+        mainwindow.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(PersonalFinancePlanner
+    qt_add_executable(PFP
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
-        aboutdialog.cpp
-        aboutdialog.h
-        aboutdialog.ui
+        aboutdialog.h aboutdialog.cpp aboutdialog.ui
         resources.qrc
-        mainwindow.ui
-
-
-        account.h account.cpp account.ui
-        savings.h savings.cpp savings.ui
         investiments.h investiments.cpp investiments.ui
-        consultant.h consultant.cpp consultant.ui
-        arduino.ino
-        serialcomm.cpp
-        serialcomm.h
+        savings.h savings.cpp savings.ui
+        account.h account.cpp account.ui
+
         serialcomm.h serialcomm.cpp
+        securitylogs.h securitylogs.cpp
+        arduino/arduino.ino
 
     )
 # Define target properties for Android with Qt 6 as:
-#    set_property(TARGET PersonalFinancePlanner APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
+#    set_property(TARGET PFP APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
 #                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
 # For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
 else()
     if(ANDROID)
-        add_library(PersonalFinancePlanner SHARED
+        add_library(PFP SHARED
             ${PROJECT_SOURCES}
         )
 # Define properties for Android with Qt 5 after find_package() calls as:
 #    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
     else()
-        add_executable(PersonalFinancePlanner
+        add_executable(PFP
             ${PROJECT_SOURCES}
         )
     endif()
 endif()
 
-target_link_libraries(PersonalFinancePlanner PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(PFP PRIVATE
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::SerialPort
+)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
 # explicit, fixed bundle identifier manually though.
 if(${QT_VERSION} VERSION_LESS 6.1.0)
-  set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.PersonalFinancePlanner)
+  set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.PFP)
 endif()
-set_target_properties(PersonalFinancePlanner PROPERTIES
+set_target_properties(PFP PROPERTIES
     ${BUNDLE_ID_OPTION}
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
@@ -75,12 +73,12 @@ set_target_properties(PersonalFinancePlanner PROPERTIES
 )
 
 include(GNUInstallDirs)
-install(TARGETS PersonalFinancePlanner
+install(TARGETS PFP
     BUNDLE DESTINATION .
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
 if(QT_VERSION_MAJOR EQUAL 6)
-    qt_finalize_executable(PersonalFinancePlanner)
+    qt_finalize_executable(PFP)
 endif()

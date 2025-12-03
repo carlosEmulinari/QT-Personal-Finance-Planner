@@ -1,25 +1,25 @@
 #ifndef SAVINGS_H
 #define SAVINGS_H
 
+#include "ui_savings.h"
 #include <QWidget>
-#include <QSerialPort>
 
 namespace Ui {
-class Savings;
+class savings;
 }
 
-class Savings : public QWidget
+class savings : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit Savings(QWidget *parent = nullptr);
-    ~Savings();
+    explicit savings(QWidget *parent = nullptr);
+    ~savings();
+
+    void openSavingsSection();
 
 private:
-    Ui::Savings *ui;
-    QSerialPort *serial;
-    void openSavingSection();
+    Ui::savings *ui;
 };
 
-#endif // SAVINGS_H
+#endif

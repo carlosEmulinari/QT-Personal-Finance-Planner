@@ -1,17 +1,19 @@
 #include "account.h"
-#include "ui_account.h"
-#include <QMessageBox>
+#include "securitylogs.h"
+#include "./ui_account.h"
 #include <QDate>
+#include <QMessageBox>
+#include <QSettings>
+#include <QDialog>
 
-
-Account::Account(QWidget *parent)
+account::account(QWidget *parent)
     : QWidget(parent)
-    , ui(new Ui::Account)
+    , ui(new Ui::account)
 {
     ui->setupUi(this);
 }
 
-void Account::openAccountSection()
+void account::openAccountSection()
 {
     QString userName = ui->lineEditUserName->text();
     QString currentDate = QDate::currentDate().toString("dd/MM/yyyy");
@@ -19,12 +21,21 @@ void Account::openAccountSection()
     if (userName.isEmpty())
         userName = "Unknown User";
 
+    Security::saveUserName(userName);
+
+
     QString message = "User: " + userName + "\nDate: " + currentDate;
 
     QMessageBox::information(this, "Account Info", message);
+
+    ui->lineEditUserName->setText(Security::loadUserName());
+
+
+    connect(ui->closeButton, &QPushButton::clicked, this, &QWidget::close);
+
 }
 
-Account::~Account()
+account::~account()
 {
     delete ui;
 }
